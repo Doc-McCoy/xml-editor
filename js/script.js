@@ -18,13 +18,20 @@ $(document).ready(function() {
 
         $("#info").hide();
         const tags = getXmlTags(code);
-        tags.forEach(criaForm);
+        tags.forEach(criaInputs);
     });
 
     $("#copiar").click(function(e) {
         e.preventDefault();
         copiarTextoParaClipboard();
     });
+
+    $('#form').on('change', 'input', function() {
+        const tag = $(this).attr('name');
+        const val = $(this).val();
+        atualizaValorDoXml(tag, val);
+        atualizaTextAreaXml();
+    })
 
     function parseXml(stringXml) {
         const parser = new DOMParser();
@@ -60,11 +67,17 @@ $(document).ready(function() {
         document.execCommand("copy");
     }
 
-    function criaForm(objTagLabel) {
+    function criaInputs(objTagLabel) {
         const form = $("#form");
         const label = $(`<label for="${objTagLabel.label}">${objTagLabel.label}</label>`);
         const valor = getValorAtualDaTagNoXml(objTagLabel.tag);
-        const input = $(`<input class="u-full-width" type="text" id="${objTagLabel.label}" value="${valor}"/>`);
+        const input = $(`<input
+            class="u-full-width"
+            type="text"
+            id="${objTagLabel.label}"
+            name="${objTagLabel.tag}"
+            value="${valor}"
+        />`);
 
         form.append(label);
         form.append(input);
@@ -74,13 +87,13 @@ $(document).ready(function() {
         const valor = xml.getElementsByTagName(tag)[0].childNodes[0].nodeValue;
         return valor;
     }
+
+    function atualizaValorDoXml(tag, valor) {
+        xml.getElementsByTagName(tag)[0].childNodes[0].nodeValue = valor;
+    }
+
+    function atualizaTextAreaXml() {
+        const stringXml = xml.documentElement.outerHTML;
+        $('#xml').val(stringXml);
+    }
 });
-
-// Acessar um elemento específico
-// console.log(xml.getElementsByTagName("ens:Usuario")[0].childNodes[0].nodeValue);
-
-// Alterar este elemento
-// xmlDoc.getElementsByTagName("ens:Usuario")[0].childNodes[0].nodeValue = "piroca";
-
-// Acessar o arquivo puro como foi passado
-// console.log(xmlDoc.documentElement.outerHTML);
