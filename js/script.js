@@ -17,7 +17,7 @@ $(document).ready(function() {
         }
 
         $("#info").hide();
-        const tags = getXmlTags(code);
+        const tags = getXmlTags(xml);
         tags.forEach(criaInputs);
     });
 
@@ -44,21 +44,15 @@ $(document).ready(function() {
         return (xml.documentElement.nodeName != "parsererror");
     }
 
-    function getXmlTags(stringXml) {
-        // Regex que pega a palavra entre o '<ens:' e o '>'
-        const regex = /<ens:(.*?)>/gm; // g: global, m: multilines
-        let match = regex.exec(stringXml);
-        let retorno = [];
-
-        while (match != null) {
-            retorno.push({
-                'tag': match[0].replace("<", "").replace(">", ""),
-                'label': match[1]
-            });
-            match = regex.exec(stringXml);
+    function getXmlTags(parsedXml) {
+        const objTags = parsedXml.getElementsByTagName("*");
+        let tags = [];
+        for (let i = 0; i < objTags.length; i++) {
+            const tag = objTags[i];
+            tags.push(tag.nodeName);
         }
 
-        return retorno;
+        return tags;
     }
 
     function copiarTextoParaClipboard() {
@@ -67,15 +61,15 @@ $(document).ready(function() {
         document.execCommand("copy");
     }
 
-    function criaInputs(objTagLabel) {
+    function criaInputs(tagLabel) {
         const form = $("#form");
-        const label = $(`<label for="${objTagLabel.label}">${objTagLabel.label}</label>`);
-        const valor = getValorAtualDaTagNoXml(objTagLabel.tag);
+        const label = $(`<label for="${tagLabel}">${tagLabel}</label>`);
+        const valor = getValorAtualDaTagNoXml(tagLabel);
         const input = $(`<input
             class="u-full-width"
             type="text"
-            id="${objTagLabel.label}"
-            name="${objTagLabel.tag}"
+            id="${tagLabel}"
+            name="${tagLabel}"
             value="${valor}"
         />`);
 
@@ -84,7 +78,13 @@ $(document).ready(function() {
     }
 
     function getValorAtualDaTagNoXml(tag) {
-        const valor = xml.getElementsByTagName(tag)[0].childNodes[0].nodeValue;
+        let valor = "";
+        const child = xml.getElementsByTagName(tag)[0].childNodes;
+
+        if (child.length > 0) {
+            valor = xml.getElementsByTagName(tag)[0].childNodes[0].nodeValue;
+        }
+
         return valor;
     }
 
