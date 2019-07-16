@@ -6,10 +6,19 @@ $(document).ready(function() {
 
         e.preventDefault();
 
+        // Limpar o form, caso já exista um
         $("#form").empty();
+
+        /* Dar trim para corrigir eventuais espaços
+        em branco ou quebra de linha que inviabilizam
+        o reconhecimento do XML pelo DOMParser */
+        $("#xml").val($("#xml").val().trim());
+
         const code = $("#xml").val();
+
         xml = parseXml(code);
 
+        // Validar o XML
         if (!verificarXmlValido(xml)) {
             alert("O XML digitado não é válido!");
             $("#info").show();
@@ -17,7 +26,11 @@ $(document).ready(function() {
         }
 
         $("#info").hide();
+
+        // Pegar as tags do XML
         const tags = getXmlTags(xml);
+
+        // Criar um input no form para cada tag do XML
         tags.forEach(criaInputs);
     });
 
