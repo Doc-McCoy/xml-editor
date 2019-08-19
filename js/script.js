@@ -34,6 +34,12 @@ $(document).ready(function() {
         tags.forEach(criaInputs);
     });
 
+    $("#remover").click(function(e) {
+        e.preventDefault();
+        removerComentarios();
+        removerLinhasEmBranco();
+    });
+
     $("#copiar").click(function(e) {
         e.preventDefault();
         copiarTextoParaClipboard();
@@ -106,7 +112,19 @@ $(document).ready(function() {
     }
 
     function atualizaTextAreaXml() {
-        const stringXml = xml.documentElement.outerHTML;
+        const stringXml = new XMLSerializer().serializeToString(xml);
         $('#xml').val(stringXml);
+    }
+
+    function removerComentarios() {
+        const regex = /<!--[\s\S]*?-->/gm;
+        const xmlSemComentarios = $("#xml").val().replace(regex, '');
+        $("#xml").val(xmlSemComentarios);
+    }
+
+    function removerLinhasEmBranco() {
+        const regex = /^\s*\n/gm;
+        const xmlSemLinhasEmBranco = $("#xml").val().replace(regex, '');
+        $("#xml").val(xmlSemLinhasEmBranco)
     }
 });
